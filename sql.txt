@@ -1,0 +1,1000 @@
+SCOTT            3000
+KING             5000
+FORD             3000
+
+SQL> SELECT * FROM EMP WHERE JOB='MANAGER';
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+
+SQL> select deptno from emp where ename='MILLER';
+
+    DEPTNO
+----------
+        10
+
+SQL> select dname from dept where deptno=(select deptno from emp where ename='MILLER');
+
+DNAME
+--------------
+ACCOUNTING
+
+SQL> select loc from dept where deptno=(select deptno from emp where ename='ADAMS');
+
+LOC
+-------------
+DALLAS
+
+SQL> select ename from emp where deptno=(select deptno from dept where loc=12);
+select ename from emp where deptno=(select deptno from dept where loc=12)
+                                                                  *
+ERROR at line 1:
+ORA-01722: invalid number
+
+
+SQL> select ename from emp where deptno=(select deptno from dept where loc=L2);
+select ename from emp where deptno=(select deptno from dept where loc=L2)
+                                                                      *
+ERROR at line 1:
+ORA-00904: "L2": invalid identifier
+
+
+SQL> select ename from emp where deptno=(select deptno from dept where loc='L2');
+
+no rows selected
+
+SQL> select count(*) from emp where deptno=(select deptno from dept where dname='D3');
+
+  COUNT(*)
+----------
+         0
+
+SQL> select ename,sal from emp where sal>(select sal from emp where ename='SCOTT') and deptno=20;
+
+no rows selected
+
+SQL> select * from emp where job='MANAGER' and deptno=(select deptno from dept where dname='ACCOUNTING');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+
+SQL> select * from emp where job=(select job from emp where ename='MILLER') and deptno=(select deptno from dept where loc
+='NEW YORK');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+
+SQL> select count(*) from emp where deptno=(select deptno from emp where ename='SMITH') and sal>(select sal from emp wher
+e ename='KING') and hiredate>(select hiredate from emp where ename='MARTIN') and deptno=(select deptno from dept where lo
+c='BOSTON');
+
+  COUNT(*)
+----------
+         0
+
+SQL> select max(sal) from emp where deptno=(select deptno from dept where loc='DALLAS');
+
+  MAX(SAL)
+----------
+      3000
+
+SQL> select max(sal) from emp;
+
+  MAX(SAL)
+----------
+      5000
+
+SQL> select ename from emp where sal=max(sal);
+select ename from emp where sal=max(sal)
+                                *
+ERROR at line 1:
+ORA-00934: group function is not allowed here
+
+
+SQL> select ename,max(sal) from emp;
+select ename,max(sal) from emp
+       *
+ERROR at line 1:
+ORA-00937: not a single-group group function
+
+
+SQL> select ename from emp where sal=(select max(sal) from emp );
+
+ENAME
+----------
+KING
+
+SQL> select ename,sal from emp where sal=(select min(sal) from emp);
+
+ENAME             SAL
+---------- ----------
+SMITH             800
+
+SQL> select ename fro emp where sal<ALL (select sal from emp where job='SALESMAN');
+select ename fro emp where sal<ALL (select sal from emp where job='SALESMAN')
+                 *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> select ename from emp where sal<All (select sal from emp where job='SALESMAN');
+
+ENAME
+----------
+SMITH
+ADAMS
+JAMES
+
+SQL> select * from emp where sal<Any (select sal from emp where job='SALESMAN');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+
+7 rows selected.
+
+SQL> select * from emp where sal>All (select sal from emp where ename='ADAMS');
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
+---------- ---------- --------- ---------- --------- ---------- ---------- ----------
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
+
+11 rows selected.
+
+SQL> select max(sal) from emp;
+
+  MAX(SAL)
+----------
+      5000
+
+SQL> select max(sal) from emp where sal=(select max(sal) from emp);
+
+  MAX(SAL)
+----------
+      5000
+
+SQL> select maX(SAL) FROM EMP WHERE SAL<SELECT MAX(SAL) FROM EMP);
+select maX(SAL) FROM EMP WHERE SAL<SELECT MAX(SAL) FROM EMP)
+                                   *
+ERROR at line 1:
+ORA-00936: missing expression
+
+
+SQL> select max(sal) from emp where sal<(select max(sal) from emp);
+
+  MAX(SAL)
+----------
+      3000
+
+SQL> select max(sal) from emp where sal<(select max(sal) from emp whre sal<(select sal from emp);
+select max(sal) from emp where sal<(select max(sal) from emp whre sal<(select sal from emp)
+                                    *
+ERROR at line 1:
+ORA-00921: unexpected end of SQL command
+
+
+SQL> select max(sal) from emp where sal<(select max(sal) from emp whre sal<(select sal from emp));
+select max(sal) from emp where sal<(select max(sal) from emp whre sal<(select sal from emp))
+                                                                  *
+ERROR at line 1:
+ORA-00907: missing right parenthesis
+
+
+SQL> select max(sal) from emp where sal<(select max(sal) from emp where sal<(select sal from emp));
+select max(sal) from emp where sal<(select max(sal) from emp where sal<(select sal from emp))
+                                                                        *
+ERROR at line 1:
+ORA-01427: single-row subquery returns more than one row
+
+
+SQL> SELECT MAX( SAL ) 3000
+  2  FROM EMP 
+  3  WHERE SAL < ( SELECT MAX( SAL ) 4000
+  4  FROM EMP 
+  5  WHERE SAL < ( SELECT MAX( SAL ) 5000
+  6  FROM EMP ) )
+  7  
+SQL> select max(sal) from emp 
+  2  where sal<(select max(sal) from emp where 
+  3  sal<(select max(sal) from emp where 
+  4  sal(select max(sal) from emp));
+where sal<(select max(sal) from emp where
+           *
+ERROR at line 2:
+ORA-00921: unexpected end of SQL command
+
+
+SQL> SELECT MAX( SAL ) FROM EMP 
+  2  WHERE SAL < ( SELECT MAX( SAL )
+  3  FROM EMP 
+  4  WHERE SAL < ( SELECT MAX( SAL )
+  5  FROM EMP 
+  6  WHERE SAL < ( SELECT MAX( SAL )
+  7  FROM EMP ) ) );
+
+  MAX(SAL)
+----------
+      2850
+
+SQL> select dname from dept where deptno=(select max(sal) from emp where sal=(select max(sal) from emp)));
+select dname from dept where deptno=(select max(sal) from emp where sal=(select max(sal) from emp)))
+                                                                                                   *
+ERROR at line 1:
+ORA-00933: SQL command not properly ended
+
+
+SQL> SELECT DNAME 
+  2  FROM DEPT 
+  3  WHERE DEPTNO = ( SELECT DEPTNO 
+  4  FROM EMP 
+  5  WHERE SAL = (SELECT MIN( SAL )
+  6  FROM EMP 
+  7  WHERE SAL > ( SELECT MIN( SAL )
+  8  FROM EMP ) ) );
+
+DNAME
+--------------
+SALES
+
+SQL> select sal(max)>2 from emp;
+select sal(max)>2 from emp
+               *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> select ename from emp where eid=(select MGR from emp ename='ALLEN');
+select ename from emp where eid=(select MGR from emp ename='ALLEN')
+                                                          *
+ERROR at line 1:
+ORA-00907: missing right parenthesis
+
+
+SQL> select ename from emp where eid=(select MANAGER from emp where ename='SMITH');
+select ename from emp where eid=(select MANAGER from emp where ename='SMITH')
+                            *
+ERROR at line 1:
+ORA-00904: "EID": invalid identifier
+
+
+SQL> select * from eid;
+select * from eid
+              *
+ERROR at line 1:
+ORA-00942: table or view does not exist
+
+
+SQL> select * from dept;
+
+    DEPTNO DNAME          LOC
+---------- -------------- -------------
+        10 ACCOUNTING     NEW YORK
+        20 RESEARCH       DALLAS
+        30 SALES          CHICAGO
+        40 OPERATIONS     BOSTON
+
+SQL> select ename,dname from emp,dept;
+
+ENAME      DNAME
+---------- --------------
+SMITH      ACCOUNTING
+ALLEN      ACCOUNTING
+WARD       ACCOUNTING
+JONES      ACCOUNTING
+MARTIN     ACCOUNTING
+BLAKE      ACCOUNTING
+CLARK      ACCOUNTING
+SCOTT      ACCOUNTING
+KING       ACCOUNTING
+TURNER     ACCOUNTING
+ADAMS      ACCOUNTING
+JAMES      ACCOUNTING
+FORD       ACCOUNTING
+MILLER     ACCOUNTING
+SMITH      RESEARCH
+ALLEN      RESEARCH
+WARD       RESEARCH
+JONES      RESEARCH
+MARTIN     RESEARCH
+BLAKE      RESEARCH
+CLARK      RESEARCH
+SCOTT      RESEARCH
+KING       RESEARCH
+TURNER     RESEARCH
+ADAMS      RESEARCH
+JAMES      RESEARCH
+FORD       RESEARCH
+MILLER     RESEARCH
+SMITH      SALES
+ALLEN      SALES
+WARD       SALES
+JONES      SALES
+MARTIN     SALES
+BLAKE      SALES
+CLARK      SALES
+SCOTT      SALES
+KING       SALES
+TURNER     SALES
+ADAMS      SALES
+JAMES      SALES
+FORD       SALES
+MILLER     SALES
+SMITH      OPERATIONS
+ALLEN      OPERATIONS
+WARD       OPERATIONS
+JONES      OPERATIONS
+MARTIN     OPERATIONS
+BLAKE      OPERATIONS
+CLARK      OPERATIONS
+SCOTT      OPERATIONS
+KING       OPERATIONS
+TURNER     OPERATIONS
+ADAMS      OPERATIONS
+JAMES      OPERATIONS
+FORD       OPERATIONS
+MILLER     OPERATIONS
+
+56 rows selected.
+
+SQL> select * from emp,dept;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO     DEPTNO DNAME          LOC
+---------- ---------- --------- ---------- --------- ---------- ---------- ---------- ---------- -------------- ---------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20         10 ACCOUNTING     NEW YORK
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30         10 ACCOUNTING     NEW YORK
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30         10 ACCOUNTING     NEW YORK
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20         10 ACCOUNTING     NEW YORK
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30         10 ACCOUNTING     NEW YORK
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30         10 ACCOUNTING     NEW YORK
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10         10 ACCOUNTING     NEW YORK
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20         10 ACCOUNTING     NEW YORK
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10         10 ACCOUNTING     NEW YORK
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30         10 ACCOUNTING     NEW YORK
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20         10 ACCOUNTING     NEW YORK
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30         10 ACCOUNTING     NEW YORK
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20         10 ACCOUNTING     NEW YORK
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10         10 ACCOUNTING     NEW YORK
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20         20 RESEARCH       DALLAS
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30         20 RESEARCH       DALLAS
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30         20 RESEARCH       DALLAS
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20         20 RESEARCH       DALLAS
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30         20 RESEARCH       DALLAS
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30         20 RESEARCH       DALLAS
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10         20 RESEARCH       DALLAS
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20         20 RESEARCH       DALLAS
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10         20 RESEARCH       DALLAS
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30         20 RESEARCH       DALLAS
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20         20 RESEARCH       DALLAS
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30         20 RESEARCH       DALLAS
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20         20 RESEARCH       DALLAS
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10         20 RESEARCH       DALLAS
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20         30 SALES          CHICAGO
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30         30 SALES          CHICAGO
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30         30 SALES          CHICAGO
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20         30 SALES          CHICAGO
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30         30 SALES          CHICAGO
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30         30 SALES          CHICAGO
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10         30 SALES          CHICAGO
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20         30 SALES          CHICAGO
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10         30 SALES          CHICAGO
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30         30 SALES          CHICAGO
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20         30 SALES          CHICAGO
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30         30 SALES          CHICAGO
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20         30 SALES          CHICAGO
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10         30 SALES          CHICAGO
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20         40 OPERATIONS     BOSTON
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30         40 OPERATIONS     BOSTON
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30         40 OPERATIONS     BOSTON
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20         40 OPERATIONS     BOSTON
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30         40 OPERATIONS     BOSTON
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30         40 OPERATIONS     BOSTON
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10         40 OPERATIONS     BOSTON
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20         40 OPERATIONS     BOSTON
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10         40 OPERATIONS     BOSTON
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30         40 OPERATIONS     BOSTON
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20         40 OPERATIONS     BOSTON
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30         40 OPERATIONS     BOSTON
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20         40 OPERATIONS     BOSTON
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10         40 OPERATIONS     BOSTON
+
+56 rows selected.
+
+SQL> select ename,dname from emp crossjoin dept;
+select ename,dname from emp crossjoin dept
+                                      *
+ERROR at line 1:
+ORA-00933: SQL command not properly ended
+
+
+SQL> select ename,dname from emp cross join dept;
+
+ENAME      DNAME
+---------- --------------
+SMITH      ACCOUNTING
+ALLEN      ACCOUNTING
+WARD       ACCOUNTING
+JONES      ACCOUNTING
+MARTIN     ACCOUNTING
+BLAKE      ACCOUNTING
+CLARK      ACCOUNTING
+SCOTT      ACCOUNTING
+KING       ACCOUNTING
+TURNER     ACCOUNTING
+ADAMS      ACCOUNTING
+JAMES      ACCOUNTING
+FORD       ACCOUNTING
+MILLER     ACCOUNTING
+SMITH      RESEARCH
+ALLEN      RESEARCH
+WARD       RESEARCH
+JONES      RESEARCH
+MARTIN     RESEARCH
+BLAKE      RESEARCH
+CLARK      RESEARCH
+SCOTT      RESEARCH
+KING       RESEARCH
+TURNER     RESEARCH
+ADAMS      RESEARCH
+JAMES      RESEARCH
+FORD       RESEARCH
+MILLER     RESEARCH
+SMITH      SALES
+ALLEN      SALES
+WARD       SALES
+JONES      SALES
+MARTIN     SALES
+BLAKE      SALES
+CLARK      SALES
+SCOTT      SALES
+KING       SALES
+TURNER     SALES
+ADAMS      SALES
+JAMES      SALES
+FORD       SALES
+MILLER     SALES
+SMITH      OPERATIONS
+ALLEN      OPERATIONS
+WARD       OPERATIONS
+JONES      OPERATIONS
+MARTIN     OPERATIONS
+BLAKE      OPERATIONS
+CLARK      OPERATIONS
+SCOTT      OPERATIONS
+KING       OPERATIONS
+TURNER     OPERATIONS
+ADAMS      OPERATIONS
+JAMES      OPERATIONS
+FORD       OPERATIONS
+MILLER     OPERATIONS
+
+56 rows selected.
+
+SQL> desc emp;
+ Name                                                                                                                                            Null?    Type
+ ------------------------------------------------------------------------------------------------------------------------
+ EMPNO                                                                                                                                           NOT NULL NUMBER(4)
+ ENAME                                                                                                                                                    VARCHAR2(10)
+ JOB                                                                                                                                                      VARCHAR2(9)
+ MGR                                                                                                                                                      NUMBER(4)
+ HIREDATE                                                                                                                                                 DATE
+ SAL                                                                                                                                                      NUMBER(7,2)
+ COMM                                                                                                                                                     NUMBER(7,2)
+ DEPTNO                                                                                                                                                   NUMBER(2)
+
+SQL> emp.empno=deptno.dept;
+SP2-0734: unknown command beginning "emp.empno=..." - rest of line ignored.
+SQL> emp.deptno=dept.deptno;
+SP2-0734: unknown command beginning "emp.deptno..." - rest of line ignored.
+SQL> emp.deptno=dept.deptno;
+SP2-0734: unknown command beginning "emp.deptno..." - rest of line ignored.
+SQL> select * from emp,dept where emp.deptno=dept.deptno;
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO     DEPTNO DNAME          LOC
+---------- ---------- --------- ---------- --------- ---------- ---------- ---------- ---------- -------------- ---------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20         20 RESEARCH       DALLAS
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30         30 SALES          CHICAGO
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30         30 SALES          CHICAGO
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20         20 RESEARCH       DALLAS
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30         30 SALES          CHICAGO
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30         30 SALES          CHICAGO
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10         10 ACCOUNTING     NEW YORK
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20         20 RESEARCH       DALLAS
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10         10 ACCOUNTING     NEW YORK
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30         30 SALES          CHICAGO
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20         20 RESEARCH       DALLAS
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30         30 SALES          CHICAGO
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20         20 RESEARCH       DALLAS
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10         10 ACCOUNTING     NEW YORK
+
+14 rows selected.
+
+SQL> select ename,dname from emp,dept where emp.deptno=dept.deptno;
+
+ENAME      DNAME
+---------- --------------
+SMITH      RESEARCH
+ALLEN      SALES
+WARD       SALES
+JONES      RESEARCH
+MARTIN     SALES
+BLAKE      SALES
+CLARK      ACCOUNTING
+SCOTT      RESEARCH
+KING       ACCOUNTING
+TURNER     SALES
+ADAMS      RESEARCH
+JAMES      SALES
+FORD       RESEARCH
+MILLER     ACCOUNTING
+
+14 rows selected.
+
+SQL> select ename,loc from emp,dept where emp.deptno=dept.deptno;
+
+ENAME      LOC
+---------- -------------
+SMITH      DALLAS
+ALLEN      CHICAGO
+WARD       CHICAGO
+JONES      DALLAS
+MARTIN     CHICAGO
+BLAKE      CHICAGO
+CLARK      NEW YORK
+SCOTT      DALLAS
+KING       NEW YORK
+TURNER     CHICAGO
+ADAMS      DALLAS
+JAMES      CHICAGO
+FORD       DALLAS
+MILLER     NEW YORK
+
+14 rows selected.
+
+SQL> select ename,loc from emp,dept where emp.deptno=dept.deptno and job='MANAGER';
+
+ENAME      LOC
+---------- -------------
+JONES      DALLAS
+BLAKE      CHICAGO
+CLARK      NEW YORK
+
+SQL> select ename,sal,dname from emp,dept where emp.deptno=dept.deptno and emp.deptno=20 and job='CLERK' and sal>1800;
+
+no rows selected
+
+SQL> select ename,deptno,dname,loc from emp,dept where emp.deptno=dept.deptno and dept.loc='NEW YORK' and sal>2000;
+select ename,deptno,dname,loc from emp,dept where emp.deptno=dept.deptno and dept.loc='NEW YORK' and sal>2000
+             *
+ERROR at line 1:
+ORA-00918: column ambiguously defined
+
+
+SQL> select ename,emp.deotno,dname,loc from emp,dept where emp.deptno=dept.deptno and sal>2000 and dept.loc='NEW YORK';
+select ename,emp.deotno,dname,loc from emp,dept where emp.deptno=dept.deptno and sal>2000 and dept.loc='NEW YORK'
+             *
+ERROR at line 1:
+ORA-00904: "EMP"."DEOTNO": invalid identifier
+
+
+SQL> select ename,emp.deptno,dname,loc from emp,dept dept where emp.deptno=dept.deptno and sal>2000 and dept.loc='NEW YOR
+K';
+
+ENAME          DEPTNO DNAME          LOC
+---------- ---------- -------------- -------------
+CLARK              10 ACCOUNTING     NEW YORK
+KING               10 ACCOUNTING     NEW YORK
+
+SQL> select ename as name,loc as locations from emp,dept where emp.deptno=dept.deptno;
+
+NAME       LOCATIONS
+---------- -------------
+SMITH      DALLAS
+ALLEN      CHICAGO
+WARD       CHICAGO
+JONES      DALLAS
+MARTIN     CHICAGO
+BLAKE      CHICAGO
+CLARK      NEW YORK
+SCOTT      DALLAS
+KING       NEW YORK
+TURNER     CHICAGO
+ADAMS      DALLAS
+JAMES      CHICAGO
+FORD       DALLAS
+MILLER     NEW YORK
+
+14 rows selected.
+
+SQL> select dname,sal as salary from emp.deptno=dept.deptno and job='ACCOUNTING';
+select dname,sal as salary from emp.deptno=dept.deptno and job='ACCOUNTING'
+                                          *
+ERROR at line 1:
+ORA-00933: SQL command not properly ended
+
+
+SQL> select dname,sal as salary from emp,dept where emp.deptno=dept.deptno and job='ACCOUNTING';
+
+no rows selected
+
+SQL> select * from emp,dept where emp.deptno=dept.deptno(+);
+
+     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO     DEPTNO DNAME          LOC
+---------- ---------- --------- ---------- --------- ---------- ---------- ---------- ---------- -------------- ---------
+      7369 SMITH      CLERK           7902 17-DEC-80        800                    20         20 RESEARCH       DALLAS
+      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30         30 SALES          CHICAGO
+      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30         30 SALES          CHICAGO
+      7566 JONES      MANAGER         7839 02-APR-81       2975                    20         20 RESEARCH       DALLAS
+      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30         30 SALES          CHICAGO
+      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30         30 SALES          CHICAGO
+      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10         10 ACCOUNTING     NEW YORK
+      7788 SCOTT      ANALYST         7566 19-APR-87       3000                    20         20 RESEARCH       DALLAS
+      7839 KING       PRESIDENT            17-NOV-81       5000                    10         10 ACCOUNTING     NEW YORK
+      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30         30 SALES          CHICAGO
+      7876 ADAMS      CLERK           7788 23-MAY-87       1100                    20         20 RESEARCH       DALLAS
+      7900 JAMES      CLERK           7698 03-DEC-81        950                    30         30 SALES          CHICAGO
+      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20         20 RESEARCH       DALLAS
+      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10         10 ACCOUNTING     NEW YORK
+
+14 rows selected.
+
+SQL> 
+SQL> select ename,dname from emp,dept where emp.deptno=dept.deptno(+);
+
+ENAME      DNAME
+---------- --------------
+SMITH      RESEARCH
+ALLEN      SALES
+WARD       SALES
+JONES      RESEARCH
+MARTIN     SALES
+BLAKE      SALES
+CLARK      ACCOUNTING
+SCOTT      RESEARCH
+KING       ACCOUNTING
+TURNER     SALES
+ADAMS      RESEARCH
+JAMES      SALES
+FORD       RESEARCH
+MILLER     ACCOUNTING
+
+14 rows selected.
+
+SQL> select ename,dname from emp,dept where emp.deptno(+)=dept.deptno;
+
+ENAME      DNAME
+---------- --------------
+CLARK      ACCOUNTING
+KING       ACCOUNTING
+MILLER     ACCOUNTING
+JONES      RESEARCH
+FORD       RESEARCH
+ADAMS      RESEARCH
+SMITH      RESEARCH
+SCOTT      RESEARCH
+WARD       SALES
+TURNER     SALES
+ALLEN      SALES
+JAMES      SALES
+BLAKE      SALES
+MARTIN     SALES
+           OPERATIONS
+
+15 rows selected.
+
+SQL> select ename,dname from emp full outer dept on emp.deptno=emp.deptno;
+select ename,dname from emp full outer dept on emp.deptno=emp.deptno
+                                       *
+ERROR at line 1:
+ORA-00905: missing keyword
+
+
+SQL> SELECT ENAME , DNAME 
+  2  FROM EMP FULL OUTER DEPT 
+  3  ON EMP.DEPTNO = DEPT.DEPTNO; 
+FROM EMP FULL OUTER DEPT
+                    *
+ERROR at line 2:
+ORA-00905: missing keyword
+
+
+SQL> SELECT ENAME , DNAME 
+  2  FROM EMP FULL OUTER DEPT 
+  3  ON EMP.DEPTNO = DEPT.DEPTNO; 
+FROM EMP FULL OUTER DEPT
+                    *
+ERROR at line 2:
+ORA-00905: missing keyword
+
+
+SQL> select e1.ename,e2.ename from emp e1,emp e2 where e1.MGR=e2.empno;
+
+ENAME      ENAME
+---------- ----------
+SMITH      FORD
+ALLEN      BLAKE
+WARD       BLAKE
+JONES      KING
+MARTIN     BLAKE
+BLAKE      KING
+CLARK      KING
+SCOTT      JONES
+TURNER     BLAKE
+ADAMS      SCOTT
+JAMES      BLAKE
+FORD       JONES
+MILLER     CLARK
+
+13 rows selected.
+
+SQL> select e1.ename,e1.sal,e2.ename,e2.sal feom emp e1,emp e2 where e1.mgr=e2.empno;
+select e1.ename,e1.sal,e2.ename,e2.sal feom emp e1,emp e2 where e1.mgr=e2.empno
+                                            *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> select e1.ename,e1.sal,e2.ename,e2.sal from emp e1,emp e2 where e1.mgr=e2.empno;
+
+ENAME             SAL ENAME             SAL
+---------- ---------- ---------- ----------
+SMITH             800 FORD             3000
+ALLEN            1600 BLAKE            2850
+WARD             1250 BLAKE            2850
+JONES            2975 KING             5000
+MARTIN           1250 BLAKE            2850
+BLAKE            2850 KING             5000
+CLARK            2450 KING             5000
+SCOTT            3000 JONES            2975
+TURNER           1500 BLAKE            2850
+ADAMS            1100 SCOTT            3000
+JAMES             950 BLAKE            2850
+FORD             3000 JONES            2975
+MILLER           1300 CLARK            2450
+
+13 rows selected.
+
+SQL> select length(ename) from emp where ename='SMITH';
+
+LENGTH(ENAME)
+-------------
+            5
+
+SQL> desc dual;
+ Name                                                                                                                                            Null?    Type
+ ------------------------------------------------------------------------------------------------------------------------
+ DUMMY                                                                                                                                                    VARCHAR2(1)
+
+SQL> select * from dual;
+
+D
+-
+X
+
+SQL> select reverse(venky) from dual;
+select reverse(venky) from dual
+               *
+ERROR at line 1:
+ORA-00904: "VENKY": invalid identifier
+
+
+SQL> select reverse('venky') from dual;
+
+REVER
+-----
+yknev
+
+SQL> 
+SQL> select last_day(sysdate);
+select last_day(sysdate)
+                       *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> select last_day(sysdate) from dual;
+
+LAST_DAY(
+---------
+31-DEC-21
+
+SQL> select trunc(months_between(sysdate,hiredate))||'months' from emp;
+
+TRUNC(MONTHS_BETWEEN(SYSDATE,HIREDATE))||'MONT
+----------------------------------------------
+491months
+489months
+489months
+488months
+482months
+487months
+485months
+415months
+480months
+483months
+414months
+480months
+480months
+478months
+
+14 rows selected.
+
+SQL> select sysdate from dual;
+
+SYSDATE
+---------
+08-DEC-21
+
+SQL> select current_date from dual;
+
+CURRENT_D
+---------
+08-DEC-21
+
+SQL> select systimestamp from dual;
+
+SYSTIMESTAMP
+---------------------------------------------------------------------------
+08-DEC-21 04.37.22.740000 PM +05:30
+
+SQL> create table customer(cid number(5),cname varchar2,cnumber number(6), cAddress varchar2);
+create table customer(cid number(5),cname varchar2,cnumber number(6), cAddress varchar2)
+                                                  *
+ERROR at line 1:
+ORA-00906: missing left parenthesis
+
+
+SQL> DRESS Varchar(15) 
+SP2-0734: unknown command beginning "DRESS Varc..." - rest of line ignored.
+SQL> (
+  2  ); 
+)
+*
+ERROR at line 2:
+ORA-00928: missing SELECT keyword
+
+
+SQL> create table customer(cid number(3),cNAme varchar2,cNo number(5),cAddress varchar2);
+create table customer(cid number(3),cNAme varchar2,cNo number(5),cAddress varchar2)
+                                                  *
+ERROR at line 1:
+ORA-00906: missing left parenthesis
+
+
+SQL> create table sample(name varchar2,id number(2));
+create table sample(name varchar2,id number(2))
+                                 *
+ERROR at line 1:
+ORA-00906: missing left parenthesis
+
+
+SQL> select * from cat;
+
+TABLE_NAME                     TABLE_TYPE
+------------------------------ -----------
+DEPT                           TABLE
+EMP                            TABLE
+BONUS                          TABLE
+SALGRADE                       TABLE
+USERS                          TABLE
+EMPLOYE2                       TABLE
+BIN$eXchkNCbSKiUl8sh66w6pw==$0 TABLE
+CUSTOMER8                      TABLE
+STUDENT2                       TABLE
+EMPLOYEE123                    TABLE
+CUSTOMERDETAILS                TABLE
+STUDENT123                     TABLE
+EMPTABLEE                      TABLE
+ADMIN                          TABLE
+BUSSERICESADDING               TABLE
+EMPL                           TABLE
+RAMAKRISHNA                    TABLE
+MV                             TABLE
+RAM                            TABLE
+TICKETDETAILS                  TABLE
+VENKY                          TABLE
+ARJUN                          TABLE
+MANOJ                          TABLE
+EMPJDBC                        TABLE
+P                              TABLE
+EMP1                           TABLE
+JSPIDERS                       TABLE
+CUSTOMERDETAILS1               TABLE
+FEEDBACK                       TABLE
+FEEDBACK1                      TABLE
+SCHOOL9_STUDENT9               TABLE
+STUDENT9                       TABLE
+EMPLOYEEVG                     TABLE
+COURSESECOND                   TABLE
+STUDENTSECOND                  TABLE
+SCHOOL9                        TABLE
+EMPLOYEEID_SEQ                 SEQUENCE
+CREDITCARD                     TABLE
+SUBJECT                        TABLE
+CUSTOMER1                      TABLE
+DEBITCARD                      TABLE
+EMPLOYEEEXAMPLE                TABLE
+LECTURER                       TABLE
+NETBANKING1                    TABLE
+NEWADMINDETAILS                TABLE
+TICKETDETAILS1                 TABLE
+USERSOURCE1                    TABLE
+FEEDBACK2                      TABLE
+RAM25                          TABLE
+NEHARKA                        TABLE
+DELOITTE                       TABLE
+HIBERNATE_SEQUENCE             SEQUENCE
+COMPANY                        TABLE
+EMPLOYEE1                      TABLE
+EMPSH                          TABLE
+EMPLOYEEE                      TABLE
+EMPLOYEES                      TABLE
+STUDENTDEMO                    TABLE
+STUDENT1_LIBRARY               TABLE
+STUDENT                        TABLE
+LIBRARY                        TABLE
+LIBRARY1                       TABLE
+CUSTOMERADD                    TABLE
+CUSTOMER                       TABLE
+STUDENTDEMOJPA                 TABLE
+STUDENT1_LIBRARY1              TABLE
+EMPLOYEE2                      TABLE
+EMPLOYEE                       TABLE
+EMPLOYEEE1                     TABLE
+COMPANY1                       TABLE
+STUDENTSM_COURSES              TABLE
+SCHOOLDEMOJPA                  TABLE
+SCHOOL                         TABLE
+COURSES                        TABLE
+SCHOOLDEMOJPA_STUDENTDEMOJPA   TABLE
+SCHOOL_STUDENT1                TABLE
+STUDENT1                       TABLE
+STUDENTSM                      TABLE
+ADDRESS                        TABLE
+
+79 rows selected.
+
+SQL> rename couses to couse;
+rename couses to couse
+*
+ERROR at line 1:
+ORA-04043: object COUSES does not exist
+
+
+SQL> rename courses to course;
+
+Table renamed.
+
+SQL> desc couse;
+ERROR:
+ORA-04043: object couse does not exist
+
+
+SQL> desc course;
+ Name                                                                                                                                            Null?    Type
+ ------------------------------------------------------------------------------------------------------------------------
+ COURSEID                                                                                                                                        NOT NULL NUMBER(10)
+ COURSENAME                                                                                                                                               VARCHAR2(255 CHAR)
+ NOOFHOURS                                                                                                                                       NOT NULL NUMBER(10)
+
+SQL> 
